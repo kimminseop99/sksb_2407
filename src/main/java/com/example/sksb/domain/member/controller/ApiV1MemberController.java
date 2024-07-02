@@ -4,6 +4,7 @@ import com.example.sksb.domain.member.entity.Member;
 import com.example.sksb.domain.member.service.MemberService;
 import com.example.sksb.global.Rsdata.RsData;
 import com.example.sksb.global.exceptions.GlobalException;
+import com.example.sksb.global.rq.Rq;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApiV1MemberController {
 
     private final MemberService memberService;
+    private  final Rq rq;
 
     @AllArgsConstructor
     @Getter
@@ -46,6 +48,9 @@ public class ApiV1MemberController {
             @Valid @RequestBody LoginRequestBody body
     ) {
         RsData<MemberService.AuthAndMakeTokensResponseBody> authAndMakeTokensRs = memberService.authAndMakeTokens(body.getUsername(), body.getPassword());
+
+        rq.setCrossDomainCookie("refreshToken", authAndMakeTokensRs.getData().getRefreshToken());
+        rq.setCrossDomainCookie("accessToken", authAndMakeTokensRs.getData().getAccessToken());
 
         return RsData.of(
                 authAndMakeTokensRs.getResultCode(),

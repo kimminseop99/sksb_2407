@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.AuthorizeRequestsDsl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -19,9 +20,19 @@ public class ApiSecurityConfig {
 
         http
                 .securityMatcher("/api/**")
+                .authorizeRequests(
+                        AuthorizeRequests -> AuthorizeRequests
+                                .requestMatchers("/api/*/members/login", "/api/*/members/logout")
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated()
+                )
                 .csrf(
                         csrf -> csrf
                                 .disable()
+                )
+                .cors(
+                        cors -> cors.configure(http)
                 )
                 .sessionManagement(
                         sessionManagement -> sessionManagement

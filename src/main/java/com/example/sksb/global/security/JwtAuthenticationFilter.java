@@ -1,7 +1,7 @@
 package com.example.sksb.global.security;
 
 import com.example.sksb.domain.member.service.MemberService;
-import com.example.sksb.global.Rsdata.RsData;
+import com.example.sksb.global.rsData.RsData;
 import com.example.sksb.global.rq.Rq;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;

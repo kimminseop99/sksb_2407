@@ -1,4 +1,4 @@
-package com.example.sksb.global.Rsdata;
+package com.example.sksb.global.rsData;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

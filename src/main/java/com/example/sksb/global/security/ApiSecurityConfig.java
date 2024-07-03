@@ -3,9 +3,7 @@ package com.example.sksb.global.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.AuthorizeRequestsDsl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -15,14 +13,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class ApiSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Bean
     SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-
         http
                 .securityMatcher("/api/**")
                 .authorizeRequests(
-                        AuthorizeRequests -> AuthorizeRequests
-                                .requestMatchers("/api/*/members/login", "/api/*/members/logout")
+                        authorizeRequests -> authorizeRequests
+                                .requestMatchers("/api/*/members/login","/api/*/members/logout")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
@@ -31,19 +29,14 @@ public class ApiSecurityConfig {
                         csrf -> csrf
                                 .disable()
                 )
-                .cors(
-                        cors -> cors.configure(http)
+                .cors(cors -> cors
+                        .configure(http)
                 )
                 .sessionManagement(
                         sessionManagement -> sessionManagement
                                 .disable()
                 )
-                .cors(cors -> cors
-                        .configure(http)
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
-
-                );
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

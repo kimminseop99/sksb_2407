@@ -1,10 +1,9 @@
 package com.example.sksb.domain.member.service;
 
 import com.example.sksb.domain.member.entity.Member;
-
 import com.example.sksb.domain.member.repository.MemberRepository;
-import com.example.sksb.global.Rsdata.RsData;
 import com.example.sksb.global.exceptions.GlobalException;
+import com.example.sksb.global.rsData.RsData;
 import com.example.sksb.global.security.SecurityUser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,10 +22,10 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
-
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthTokenService authTokenService;
+
     public Optional<Member> findByUsername(String username) {
         return memberRepository.findByUsername(username);
     }
@@ -35,15 +34,21 @@ public class MemberService {
         return passwordEncoder.matches(password, member.getPassword());
     }
 
+    @Transactional
     public void join(String username, String password) {
         Member member = Member.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .build();
+
         String refreshToken = authTokenService.genRefreshToken(member);
         member.setRefreshToken(refreshToken);
 
         memberRepository.save(member);
+    }
+
+    public boolean validateToken(String token) {
+        return authTokenService.validateToken(token);
     }
 
     public boolean validataToken(String token) {
@@ -56,7 +61,6 @@ public class MemberService {
         private Member member;
         private String accessToken;
         private String refreshToken;
-
     }
 
     @Transactional
@@ -79,7 +83,8 @@ public class MemberService {
 
     public SecurityUser getUserFromAccessToken(String accessToken) {
         Map<String, Object> payloadBody = authTokenService.getDataFrom(accessToken);
-        long id = (int) payloadBody.get("id");
+
+        long id = (Integer) payloadBody.get("id");
         String username = (String) payloadBody.get("username");
         List<String> authorities = (List<String>) payloadBody.get("authorities");
 
@@ -92,7 +97,7 @@ public class MemberService {
         );
     }
 
-    public RsData<String> refreshAccessToken(String refreshToken){
+    public RsData<String> refreshAccessToken(String refreshToken) {
         Member member = memberRepository.findByRefreshToken(refreshToken).orElseThrow(
                 () -> new GlobalException("400-1", "존재하지 않는 리프레시 토큰입니다.")
         );
